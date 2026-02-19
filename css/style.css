@@ -63,11 +63,70 @@
     nav a {
       color: var(--muted);
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
       transition: color 0.2s ease;
+    }
+
+    .home-link {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      display: inline-grid;
+      place-items: center;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      flex: 0 0 32px;
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .home-link svg {
+      width: 16px;
+      height: 16px;
+      display: block;
     }
 
     nav a:hover {
       color: var(--ink);
+    }
+
+    .home-link:hover,
+    .home-link:focus-visible {
+      transform: translateY(-1px);
+      color: var(--ink);
+      border-color: rgba(240, 74, 58, 0.65);
+    }
+
+    .floating-home {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 1px solid rgba(240, 74, 58, 0.55);
+      background: rgba(11, 13, 16, 0.85);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      z-index: 1300;
+      box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.8);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .floating-home svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .floating-home:hover,
+    .floating-home:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(247, 197, 72, 0.75);
+      box-shadow: 0 18px 32px -18px rgba(240, 74, 58, 0.6);
     }
 
     .hero {
@@ -260,6 +319,12 @@
       object-position: center;
       display: block;
       background: #0b0d10;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+    }
+
+    .fleet-focus-media.is-fading {
+      opacity: 0.4;
     }
 
     .fleet-focus-close {
@@ -450,6 +515,12 @@
       object-position: center;
       display: block;
       background: #0f1217;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+    }
+
+    .car-photo img.is-fading {
+      opacity: 0.4;
     }
 
     .car-photo .overlay {
@@ -701,6 +772,62 @@
       min-height: 320px;
       border: 0;
       display: block;
+    }
+
+    .crew-hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+      align-items: center;
+      padding: 42px 0 20px;
+    }
+
+    .crew-hero h1 {
+      font-size: clamp(42px, 8vw, 80px);
+      line-height: 0.95;
+      margin: 0 0 12px;
+    }
+
+    .crew-hero p {
+      margin: 0 0 24px;
+      font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .crew-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    .crew-card {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .crew-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(240, 74, 58, 0.65);
+      box-shadow: 0 18px 28px -20px rgba(240, 74, 58, 0.45);
+    }
+
+    .crew-card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      text-transform: uppercase;
+    }
+
+    .crew-card p {
+      margin: 0;
+      font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
     }
 
     footer {

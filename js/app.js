@@ -32,7 +32,7 @@
 })();
 
 (() => {
-  const carPhotos = Array.from(document.querySelectorAll(".fleet .car-photo[data-gallery]"));
+  const carPhotos = Array.from(document.querySelectorAll(".car-photo[data-gallery]"));
   if (carPhotos.length === 0) return;
 
   const parseList = (value, separator) =>
@@ -45,7 +45,7 @@
     const sources = parseList(photo.dataset.gallery, ",");
     if (sources.length < 2) return;
 
-    const card = photo.closest(".car");
+    const card = photo.closest(".car, .crew-card");
     if (!card) return;
     if (!card.dataset.cardId) {
       card.dataset.cardId = `car-${photoIndex}`;
@@ -87,14 +87,36 @@
       return dot;
     });
 
-    const setSlide = (index) => {
-      currentIndex = (index + sources.length) % sources.length;
-      img.src = sources[currentIndex];
-      img.alt = alts[currentIndex] || alts[0] || "Foto da frota";
-      photo.dataset.activeIndex = String(currentIndex);
-      dotButtons.forEach((dot, dotIndex) => {
-        dot.classList.toggle("is-active", dotIndex === currentIndex);
-      });
+    const setSlide = (index, animate = true) => {
+      const nextIndex = (index + sources.length) % sources.length;
+      if (nextIndex === currentIndex && img.getAttribute("src")) return;
+
+      const applySlide = () => {
+        currentIndex = nextIndex;
+        img.src = sources[currentIndex];
+        img.alt = alts[currentIndex] || alts[0] || "Foto da frota";
+        photo.dataset.activeIndex = String(currentIndex);
+        dotButtons.forEach((dot, dotIndex) => {
+          dot.classList.toggle("is-active", dotIndex === currentIndex);
+        });
+      };
+
+      if (!animate) {
+        applySlide();
+        return;
+      }
+
+      img.classList.add("is-fading");
+      window.setTimeout(() => {
+        applySlide();
+        const clearFade = () => img.classList.remove("is-fading");
+        if (img.complete) {
+          window.requestAnimationFrame(clearFade);
+        } else {
+          img.addEventListener("load", clearFade, { once: true });
+          window.setTimeout(clearFade, 280);
+        }
+      }, 120);
     };
 
     fleetGalleryControllers.set(cardId, {
@@ -125,7 +147,7 @@
     });
 
     photo.append(prevButton, nextButton, dotsWrap);
-    setSlide(0);
+    setSlide(0, false);
   });
 })();
 
@@ -169,6 +191,7 @@
   function FleetFocusOverlay() {
     const [activeCard, setActiveCard] = useState(null);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isOverlayImageFading, setIsOverlayImageFading] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const enterDelayMs = 35;
     const unmountDelayMs = 360;
@@ -222,6 +245,7 @@
       const startIndex = Math.min(Math.max(data.activeIndex, 0), maxIndex);
       setActiveCard(data);
       setActiveImageIndex(startIndex);
+      setIsOverlayImageFading(false);
       showTimerRef.current = window.setTimeout(() => setIsVisible(true), enterDelayMs);
     };
 
@@ -230,8 +254,25 @@
       const currentCard = activeCardRef.current;
       const selectedIndex = activeImageIndexRef.current;
       syncCardSelection(currentCard, selectedIndex);
+      setIsOverlayImageFading(false);
       setIsVisible(false);
       unmountTimerRef.current = window.setTimeout(() => setActiveCard(null), unmountDelayMs);
+    };
+
+    const changeOverlaySlide = (resolver) => {
+      const current = activeCardRef.current;
+      const gallerySize = current?.gallery?.length || 0;
+      if (gallerySize <= 1) return;
+      setIsOverlayImageFading(true);
+      window.setTimeout(() => {
+        setActiveImageIndex((index) => {
+          const nextIndex = resolver(index, gallerySize);
+          return (nextIndex + gallerySize) % gallerySize;
+        });
+        window.requestAnimationFrame(() => {
+          window.setTimeout(() => setIsOverlayImageFading(false), 16);
+        });
+      }, 120);
     };
 
     useEffect(() => {
@@ -248,10 +289,10 @@
           hide();
         }
         if (event.key === "ArrowRight" && current.gallery.length > 1) {
-          setActiveImageIndex((index) => (index + 1) % current.gallery.length);
+          changeOverlaySlide((index, size) => (index + 1) % size);
         }
         if (event.key === "ArrowLeft" && current.gallery.length > 1) {
-          setActiveImageIndex((index) => (index - 1 + current.gallery.length) % current.gallery.length);
+          changeOverlaySlide((index, size) => (index - 1 + size) % size);
         }
       };
       document.addEventListener("keydown", onKeyDown);
@@ -307,7 +348,7 @@
         ),
         currentImageSrc
           ? React.createElement("img", {
-              className: "fleet-focus-media",
+              className: `fleet-focus-media ${isOverlayImageFading ? "is-fading" : ""}`,
               src: currentImageSrc,
               alt: currentImageAlt,
             })
@@ -324,7 +365,7 @@
                   "aria-label": "Foto anterior",
                   onClick: (event) => {
                     event.stopPropagation();
-                    setActiveImageIndex((index) => (index - 1 + gallerySize) % gallerySize);
+                    changeOverlaySlide((index, size) => (index - 1 + size) % size);
                   },
                 },
                 "<"
@@ -337,7 +378,7 @@
                   "aria-label": "Proxima foto",
                   onClick: (event) => {
                     event.stopPropagation();
-                    setActiveImageIndex((index) => (index + 1) % gallerySize);
+                    changeOverlaySlide((index, size) => (index + 1) % size);
                   },
                 },
                 ">"
@@ -353,7 +394,7 @@
                     "aria-label": `Ir para foto ${dotIndex + 1}`,
                     onClick: (event) => {
                       event.stopPropagation();
-                      setActiveImageIndex(dotIndex);
+                      changeOverlaySlide(() => dotIndex);
                     },
                   })
                 )

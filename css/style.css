@@ -1,4 +1,4 @@
-﻿:root {
+:root {
       --bg: #0b0d10;
       --bg-alt: #151a20;
       --ink: #f4f2ed;
@@ -219,9 +219,11 @@
     .fleet-focus-overlay.is-visible {
       opacity: 1;
       visibility: visible;
+      pointer-events: auto;
     }
 
     .fleet-focus-card {
+      position: relative;
       width: min(980px, 96vw);
       max-height: 92vh;
       overflow: auto;
@@ -247,6 +249,69 @@
       object-position: center;
       display: block;
       background: #0b0d10;
+    }
+
+    .fleet-focus-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.24);
+      background: rgba(11, 13, 16, 0.85);
+      color: var(--ink);
+      font-size: 26px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .fleet-focus-control {
+      position: absolute;
+      top: 45%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.3);
+      background: rgba(11, 13, 16, 0.78);
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .fleet-focus-control.prev { left: 14px; }
+    .fleet-focus-control.next { right: 14px; }
+
+    .fleet-focus-dots {
+      position: absolute;
+      left: 50%;
+      top: min(56vh, 460px);
+      transform: translate(-50%, -18px);
+      display: flex;
+      gap: 8px;
+      z-index: 3;
+    }
+
+    .fleet-focus-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.45);
+      background: rgba(244, 242, 237, 0.2);
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .fleet-focus-dot.is-active {
+      border-color: var(--accent-2);
+      background: var(--accent-2);
     }
 
     .fleet-focus-content {
@@ -398,6 +463,53 @@
       border: 1px dashed rgba(244, 242, 237, 0.2);
       padding: 10px 14px;
       border-radius: 999px;
+    }
+
+    .car-photo-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.3);
+      background: rgba(11, 13, 16, 0.7);
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      z-index: 4;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .car-photo-control.prev { left: 8px; }
+    .car-photo-control.next { right: 8px; }
+
+    .car-photo-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 4;
+    }
+
+    .car-photo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.45);
+      background: rgba(244, 242, 237, 0.2);
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .car-photo-dot.is-active {
+      background: var(--accent-2);
+      border-color: var(--accent-2);
     }
 
     .tag {
@@ -617,6 +729,11 @@
 
       .location {
         grid-template-columns: 1fr;
+      }
+
+      .car-photo-control {
+        width: 34px;
+        height: 34px;
       }
     }
 .logo-title {

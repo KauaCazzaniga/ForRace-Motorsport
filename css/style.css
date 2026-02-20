@@ -60,6 +60,31 @@
       text-transform: uppercase;
     }
 
+    .mobile-quick-nav {
+      display: none;
+      width: 100%;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .mobile-quick-nav a {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
     nav a {
       color: var(--muted);
       text-decoration: none;
@@ -135,6 +160,34 @@
       gap: 32px;
       padding: 48px 0 24px;
       align-items: center;
+    }
+
+    .pilots-entry {
+      margin: 10px 0 6px;
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(130deg, rgba(240, 74, 58, 0.14), rgba(247, 197, 72, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .pilots-entry h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+
+    .pilots-entry p {
+      margin: 0;
+      font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+      color: var(--muted);
+    }
+
+    .pilots-entry-cta {
+      flex: 0 0 auto;
     }
 
     .hero h1 {
@@ -314,7 +367,7 @@
 
     .fleet-focus-media {
       width: 100%;
-      height: min(56vh, 460px);
+      height: clamp(220px, 56vh, 460px);
       object-fit: cover;
       object-position: center;
       display: block;
@@ -506,6 +559,7 @@
       overflow: hidden;
       display: grid;
       place-items: center;
+      cursor: pointer;
     }
 
     .car-photo img {
@@ -801,8 +855,22 @@
         display: none;
       }
 
+      .mobile-quick-nav {
+        display: flex;
+      }
+
       .hero {
         padding-top: 20px;
+      }
+
+      .pilots-entry {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .pilots-entry h2 {
+        font-size: 20px;
       }
 
       .fleet {
@@ -825,6 +893,10 @@
         aspect-ratio: 16 / 9;
       }
 
+      .car-photo img {
+        min-height: 190px;
+      }
+
       .car-photo .overlay {
         font-size: 15px;
       }
@@ -839,8 +911,8 @@
       }
 
       .car-photo-control {
-        width: 34px;
-        height: 34px;
+        width: 38px;
+        height: 38px;
       }
 
       .fleet-focus-overlay {
@@ -854,7 +926,7 @@
       }
 
       .fleet-focus-media {
-        height: min(42vh, 280px);
+        height: clamp(220px, 42vh, 320px);
       }
 
       .fleet-focus-control {

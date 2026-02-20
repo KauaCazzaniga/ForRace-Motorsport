@@ -58,4 +58,13 @@
   .crew-hero {
     padding-top: 20px;
   }
+
+  .crew-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crew-card .car-photo {
+    min-height: 190px;
+    aspect-ratio: 16 / 9;
+  }
 }

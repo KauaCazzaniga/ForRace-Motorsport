@@ -34,6 +34,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      position: relative;
     }
 
     .logo {
@@ -69,27 +70,28 @@
 
     .mobile-quick-nav {
       display: none;
-      width: 100%;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: thin;
+      width: auto;
+      margin-left: auto;
+      justify-content: flex-end;
     }
 
-    .mobile-quick-nav a {
+    .mobile-menu-toggle {
       flex: 0 0 auto;
-      min-height: 38px;
-      padding: 0 14px;
+      width: 38px;
+      height: 38px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      text-decoration: none;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.8px;
+      background: rgba(255, 255, 255, 0.05);
       color: var(--ink);
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.04);
+      font-size: 20px;
+      line-height: 1;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .mobile-menu-panel {
+      display: none;
     }
 
     nav a {
@@ -715,6 +717,16 @@
       background: rgba(240, 74, 58, 0.15);
     }
 
+    .car-action.is-disabled {
+      border-color: rgba(244, 242, 237, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+      color: rgba(244, 242, 237, 0.55);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+      pointer-events: none;
+    }
+
     .car-stats {
       margin-top: auto;
       display: grid;
@@ -803,9 +815,33 @@
       gap: 8px;
     }
 
+    .agenda-list li.is-collapsed-hidden {
+      display: none;
+    }
+
     .agenda-list li {
       padding-bottom: 8px;
       border-bottom: 1px solid var(--line);
+    }
+
+    .agenda-toggle {
+      margin-top: 12px;
+      min-height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.26);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 11px;
+      padding: 0 12px;
+      cursor: pointer;
+      width: fit-content;
+    }
+
+    .agenda-block {
+      display: flex;
+      flex-direction: column;
     }
 
     .cta-band {
@@ -904,6 +940,55 @@
 
       .mobile-quick-nav {
         display: flex;
+        width: auto;
+        margin-left: auto;
+        justify-content: flex-end;
+        position: relative;
+        z-index: 1401;
+      }
+
+      .mobile-menu-panel {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        width: min(320px, calc(100vw - 48px));
+        max-height: 420px;
+        opacity: 0;
+        overflow-y: auto;
+        transform: translateY(-6px) scale(0.98);
+        transform-origin: top right;
+        transition: opacity 0.22s ease, transform 0.22s ease;
+        padding: 10px;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 1400;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(11, 13, 16, 0.96);
+        box-shadow: 0 24px 42px -24px rgba(0, 0, 0, 0.85);
+        pointer-events: none;
+      }
+
+      .mobile-menu-panel.is-open {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+
+      .mobile-menu-panel a {
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.8px;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
       }
 
       .hero {
@@ -920,18 +1005,57 @@
         font-size: 20px;
       }
 
-      .fleet {
-        grid-template-columns: 1fr;
+      .fleet,
+      .grid {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        padding: 4px 2px 12px;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .fleet::-webkit-scrollbar,
+      .grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      .fleet > .car,
+      .grid > .card {
+        flex: 0 0 60%;
+        max-width: 60%;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+        transition: transform 0.35s ease, opacity 0.35s ease;
       }
 
       .car {
-        padding: 18px;
+        padding: 14px;
+      }
+
+      .card {
+        padding: 14px;
       }
 
       .car:hover {
         transform: none;
         border-color: var(--line);
         box-shadow: 0 10px 18px -16px rgba(0, 0, 0, 0.45);
+      }
+
+      .agenda-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .agenda-grid > .card {
+        flex: initial;
+        max-width: none;
       }
 
       .car-photo {

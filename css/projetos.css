@@ -63,11 +63,60 @@
   font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
 }
 
+.project-card > ul {
+  display: none;
+}
+
+.project-rent-preview {
+  margin-top: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(240, 74, 58, 0.4);
+  background: rgba(240, 74, 58, 0.08);
+  padding: 12px;
+}
+
+.project-rent-preview h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--accent-2);
+}
+
+.project-rent-preview p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.project-rent-preview .project-rent-link {
+  min-height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 74, 58, 0.55);
+  background: rgba(240, 74, 58, 0.15);
+  color: var(--ink);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.project-rent-preview .project-rent-link.is-disabled {
+  border-color: rgba(244, 242, 237, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(244, 242, 237, 0.58);
+  pointer-events: none;
+}
+
 .service-widgets {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 18px;
   justify-items: center;
+  justify-content: center;
 }
 
 #servicos.section-title {
@@ -84,6 +133,7 @@
   border: 1px solid rgba(240, 74, 58, 0.36);
   background: linear-gradient(145deg, rgba(240, 74, 58, 0.14), rgba(247, 197, 72, 0.08));
   padding: 22px;
+  text-align: center;
 }
 
 .service-widget-clickable {
@@ -111,16 +161,19 @@
 }
 
 .service-widget ul {
-  margin: 0 0 18px;
+  margin: 0 auto 18px;
   padding-left: 18px;
   display: grid;
   gap: 6px;
   color: var(--muted);
   font-family: "Trebuchet MS", "Lucida Sans", sans-serif;
+  text-align: left;
+  width: fit-content;
 }
 
 .service-cta {
   width: fit-content;
+  margin: 0 auto;
 }
 
 .projects-hero .hero-card .cta-group {
@@ -189,6 +242,7 @@
   display: grid;
   place-items: center;
   cursor: pointer;
+  z-index: 5;
 }
 
 .project-focus-media-wrap {
@@ -304,7 +358,57 @@
 
   .projects-grid,
   .service-widgets {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .projects-grid::-webkit-scrollbar,
+  .service-widgets::-webkit-scrollbar {
+    display: none;
+  }
+
+  .projects-grid > .project-card,
+  .service-widgets > .service-widget {
+    flex: 0 0 60%;
+    max-width: 60%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
+
+  .service-widgets {
+    justify-content: center;
+    overflow: visible;
+    padding: 4px 0 12px;
+  }
+
+  .service-widgets > .service-widget {
+    flex: 0 1 min(620px, 100%);
+    max-width: min(620px, 100%);
+  }
+
+  .project-card,
+  .service-widget {
+    padding: 14px;
+  }
+
+  .project-card .car-photo {
+    height: 180px;
+    min-height: 180px;
+    aspect-ratio: auto;
+  }
+
+  .project-card .car-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 
   .project-focus-overlay {

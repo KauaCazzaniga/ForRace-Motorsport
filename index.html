@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -25,22 +25,16 @@
           <path fill="currentColor" d="M12 3.1 3 10.2v10h6.4v-6.2h5.2v6.2H21v-10L12 3.1zm0 2.3 7 5.5v7.3h-2.4V12h-9.2v6.2H5v-7.3l7-5.5z"/>
         </svg>
       </a>
-      <a href="#cars">Frota</a>
       <a href="pilotos.html">Pilotos</a>
       <a href="projetos.html">Projetos</a>
-      <a href="#historia">Nossa Historia</a>
-      <a href="#base">Base</a>
       <a href="#agenda">Agenda</a>
       <a href="#localizacao">Localizacao</a>
       <a href="#contato">Contato</a>
     </nav>
     <div class="mobile-quick-nav" aria-label="Navegacao rapida">
-      <a href="#cars">Frota</a>
-      <a href="pilotos.html">Pilotos</a>
-      <a href="projetos.html">Projetos</a>
-      <a href="#agenda">Agenda</a>
-      <a href="#contato">Contato</a>
+      <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu de navegacao">=</button>
     </div>
+    <div class="mobile-menu-panel" aria-hidden="true"></div>
   </header>
 
   <section class="hero">
@@ -65,14 +59,6 @@
     </div>
   </section>
 
-  <section class="pilots-entry" aria-label="Acesso para pagina de pilotos">
-    <div>
-      <h2>Pilotos e mecanicos</h2>
-      <p>Conheca a historia de cada pessoa da equipe ForRace.</p>
-    </div>
-    <a class="cta pilots-entry-cta" href="pilotos.html">Ir para Pilotos</a>
-  </section>
-
   <section class="pilots-entry" aria-label="Acesso para pagina de projetos">
     <div>
       <h2>Projetos em destaque</h2>
@@ -93,7 +79,7 @@
       <p>Chassi leve, motor aspirado e equilibrio para provas curtas. O classico que abre espaco no grid.</p>
       <div class="car-actions">
         <a class="car-action" href="projetos.html#destaques">Saiba mais</a>
-        <a class="car-action is-primary" href="https://wa.me/5511945339281" target="_blank" rel="noopener">Consulte disponibilidade</a>
+        <span class="car-action is-disabled" aria-disabled="true">Indisponivel para locacao</span>
       </div>
       <div class="car-stats">
         <div>Potencia<span>135 cv</span></div>
@@ -109,7 +95,7 @@
       </div>
       <div class="tag">Rally classicos </div>
       <h3>Escort RS</h3>
-      <p>Torque agressivo, tracao firme e estilo setentista. O carro que comunica com vocÃª.</p>
+      <p>Torque agressivo, tracao firme e estilo setentista. O carro que comunica com você.</p>
       <div class="car-actions">
         <a class="car-action" href="projetos.html#destaques">Saiba mais</a>
         <a class="car-action is-primary" href="https://wa.me/5511945339281" target="_blank" rel="noopener">Consulte disponibilidade</a>
@@ -122,7 +108,10 @@
       <div class="stripe"></div>
     </article>
     <article class="car">
-      <div class="car-photo" data-gallery="" data-gallery-alts=""><span>Foto do carro</span></div>
+      <div class="car-photo" data-gallery="img/gol-rally.png" data-gallery-alts="Gol Rally em pista">
+        <img src="img/gol-rally.png" alt="Gol Rally em pista" loading="lazy" decoding="async" />
+        <div class="overlay">Gol</div>
+      </div>
       <div class="tag">Rally classicos</div>
       <h3>Gol Rally</h3>
       <p>Leveza, freio forte e pegada de pista antiga. O parceiro do Escort nas provas classicas.</p>
@@ -171,24 +160,8 @@
     </p>
   </section>
 
-  <h2 class="section-title" id="base">Base e cultura</h2>
-  <section class="grid">
-    <div class="card">
-      <h4>Workshop</h4>
-      <p>Equipe dedicada a setups rapidos,e prototipagem direta na pista.</p>
-    </div>
-    <div class="card">
-      <h4>Telemetria</h4>
-      <p>Analise de dados em tempo real para ajustar pressao, torque e aerodinamica.</p>
-    </div>
-    <div class="card">
-      <h4>Comunicacao</h4>
-      <p>Radio estrategico, sinais claros e foco total em performance coletiva.</p>
-    </div>
-  </section>
-
   <h2 class="section-title" id="agenda">Agenda 2026</h2>
-  <section class="grid">
+  <section class="grid agenda-grid">
     <div class="card agenda-block">
       <h4>IMS - Interlagos Sports Marketing</h4>
       <ul class="agenda-list">

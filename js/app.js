@@ -32,6 +32,76 @@
 })();
 
 (() => {
+  const header = document.querySelector("header");
+  const nav = header?.querySelector("nav");
+  const quickNav = header?.querySelector(".mobile-quick-nav");
+  const toggle = quickNav?.querySelector(".mobile-menu-toggle");
+  const panel = header?.querySelector(".mobile-menu-panel");
+
+  if (!header || !nav || !quickNav || !toggle || !panel) return;
+
+  const navLinks = Array.from(nav.querySelectorAll("a"));
+  if (navLinks.length === 0) return;
+
+  const used = new Set();
+  navLinks.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (!href) return;
+
+    const label = (link.textContent || "").trim() || link.getAttribute("aria-label") || "Inicio";
+    const key = `${href}|${label}`;
+    if (used.has(key)) return;
+    used.add(key);
+
+    const panelLink = document.createElement("a");
+    panelLink.href = href;
+    panelLink.textContent = label;
+    panel.appendChild(panelLink);
+  });
+
+  const closeMenu = () => {
+    toggle.setAttribute("aria-expanded", "false");
+    panel.classList.remove("is-open");
+    panel.setAttribute("aria-hidden", "true");
+  };
+
+  const openMenu = () => {
+    toggle.setAttribute("aria-expanded", "true");
+    panel.classList.add("is-open");
+    panel.setAttribute("aria-hidden", "false");
+  };
+
+  toggle.addEventListener("click", () => {
+    const isOpen = panel.classList.contains("is-open");
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
+    openMenu();
+  });
+
+  panel.addEventListener("click", (event) => {
+    if (event.target.closest("a")) closeMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!panel.classList.contains("is-open")) return;
+    if (header.contains(event.target)) return;
+    closeMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (!panel.classList.contains("is-open")) return;
+    closeMenu();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 720) closeMenu();
+  });
+})();
+
+(() => {
   const carPhotos = Array.from(document.querySelectorAll(".car-photo[data-gallery]"));
   if (carPhotos.length === 0) return;
 
@@ -408,7 +478,7 @@
   closeButton.type = "button";
   closeButton.className = "project-focus-close";
   closeButton.setAttribute("aria-label", "Fechar projeto");
-  closeButton.textContent = "×";
+  closeButton.textContent = "X";
 
   const mediaWrap = document.createElement("div");
   mediaWrap.className = "project-focus-media-wrap";
@@ -493,6 +563,25 @@
     shortCopy.textContent = activeData.shortCopy;
     detailCopy.textContent = activeData.detail;
     rentText.textContent = activeData.rentLabel;
+    if (activeData.rentUrl) {
+      rentWidget.style.display = "block";
+      rentCta.href = activeData.rentUrl;
+      rentCta.style.pointerEvents = "auto";
+      rentCta.style.opacity = "1";
+      rentCta.textContent = "Consultar disponibilidade";
+      rentCta.removeAttribute("aria-disabled");
+      rentCta.setAttribute("target", "_blank");
+      rentCta.setAttribute("rel", "noopener");
+    } else {
+      rentWidget.style.display = "none";
+      rentCta.removeAttribute("href");
+      rentCta.style.pointerEvents = "none";
+      rentCta.style.opacity = "0.6";
+      rentCta.textContent = "Locacao indisponivel";
+      rentCta.setAttribute("aria-disabled", "true");
+      rentCta.removeAttribute("target");
+      rentCta.removeAttribute("rel");
+    }
 
     const hasGallery = size > 1;
     prevButton.style.display = hasGallery ? "grid" : "none";
@@ -535,6 +624,27 @@
     const gallery = parseList(el.dataset.gallery, ",");
     if (gallery.length === 0) return;
     const alts = parseList(el.dataset.galleryAlts, "|");
+    const rentLabel = el.dataset.rentLabel || "Disponivel sob consulta.";
+    const rentUrl = el.dataset.rentUrl || "";
+
+    const preview = document.createElement("div");
+    preview.className = "project-rent-preview";
+
+    const previewTitle = document.createElement("h4");
+    previewTitle.textContent = rentUrl ? "Aluga-se" : "Indisponivel";
+    preview.append(previewTitle);
+    const summaryElement = el.querySelector("p");
+    if (summaryElement) {
+      summaryElement.insertAdjacentElement("afterend", preview);
+    } else {
+      const titleElement = el.querySelector("h3");
+      if (titleElement) {
+        titleElement.insertAdjacentElement("afterend", preview);
+      } else {
+        el.appendChild(preview);
+      }
+    }
+
     const data = {
       gallery,
       alts,
@@ -542,7 +652,8 @@
       title: el.querySelector("h3")?.textContent?.trim() || "Projeto ForRace",
       shortCopy: el.querySelector("p")?.textContent?.trim() || "",
       detail: el.dataset.detail || "",
-      rentLabel: el.dataset.rentLabel || "Disponivel sob consulta.",
+      rentLabel,
+      rentUrl,
     };
     el.addEventListener("click", () => open(data));
   });
@@ -591,5 +702,44 @@
     widget.setAttribute("tabindex", "0");
     widget.setAttribute("role", "link");
     widget.setAttribute("aria-label", "Abrir atendimento de locacao no WhatsApp");
+  });
+})();
+
+(() => {
+  const agendaLists = Array.from(document.querySelectorAll(".agenda-block .agenda-list"));
+  if (agendaLists.length === 0) return;
+
+  const collapsedItemsCount = 5;
+
+  agendaLists.forEach((list, listIndex) => {
+    const items = Array.from(list.querySelectorAll("li"));
+    if (items.length <= collapsedItemsCount) return;
+
+    let isExpanded = false;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "agenda-toggle";
+
+    const render = () => {
+      items.forEach((item, itemIndex) => {
+        const shouldHide = !isExpanded && itemIndex >= collapsedItemsCount;
+        item.classList.toggle("is-collapsed-hidden", shouldHide);
+      });
+      button.textContent = isExpanded ? "Ver menos datas" : "Ver mais datas";
+      button.setAttribute("aria-expanded", String(isExpanded));
+      button.setAttribute("aria-controls", list.id);
+    };
+
+    if (!list.id) {
+      list.id = `agenda-list-${listIndex + 1}`;
+    }
+
+    button.addEventListener("click", () => {
+      isExpanded = !isExpanded;
+      render();
+    });
+
+    list.insertAdjacentElement("afterend", button);
+    render();
   });
 })();

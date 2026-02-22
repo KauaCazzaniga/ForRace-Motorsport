@@ -60,11 +60,42 @@
   }
 
   .crew-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .crew-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .crew-grid > .crew-card {
+    flex: 0 0 60%;
+    max-width: 60%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+  }
+
+  .crew-card {
+    padding: 14px;
   }
 
   .crew-card .car-photo {
-    min-height: 190px;
-    aspect-ratio: 16 / 9;
+    height: auto;
+    min-height: 260px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .crew-card .car-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
   }
 }

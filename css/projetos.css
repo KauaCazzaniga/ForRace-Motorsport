@@ -403,6 +403,23 @@
     padding: 14px;
   }
 
+  .project-card {
+    text-align: left;
+  }
+
+  .project-card h3,
+  .project-card p {
+    text-align: left;
+  }
+
+  .project-card .project-rent-preview {
+    width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+  }
+
   .project-card .car-photo {
     height: auto;
     min-height: 0;

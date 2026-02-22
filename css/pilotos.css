@@ -54,6 +54,7 @@
   font-size: 14px;
 }
 
+
 @media (max-width: 720px) {
   .crew-hero {
     padding-top: 20px;
@@ -98,4 +99,5 @@
     object-fit: cover;
     object-position: center top;
   }
+
 }

@@ -1,5 +1,24 @@
 ﻿const fleetGalleryControllers = new Map();
 
+const parseDelimitedList = (value, separator) =>
+  (value || "")
+    .split(separator)
+    .map((item) => item.trim())
+    .filter(Boolean);
+const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
+  element.classList.add(fadeClassName);
+  window.setTimeout(() => {
+    swap();
+    const clearFade = () => element.classList.remove(fadeClassName);
+    if (element.complete) {
+      window.requestAnimationFrame(clearFade);
+    } else {
+      element.addEventListener("load", clearFade, { once: true });
+      window.setTimeout(clearFade, 280);
+    }
+  }, swapDelayMs);
+};
+
 (() => {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const topGap = 18;
@@ -27,7 +46,9 @@
       behavior: prefersReducedMotion.matches ? "auto" : "smooth",
     });
 
-    history.pushState(null, "", hash);
+    if (window.location.hash !== hash) {
+      history.pushState(null, "", hash);
+    }
   });
 })();
 
@@ -105,14 +126,8 @@
   const carPhotos = Array.from(document.querySelectorAll(".car-photo[data-gallery]"));
   if (carPhotos.length === 0) return;
 
-  const parseList = (value, separator) =>
-    (value || "")
-      .split(separator)
-      .map((item) => item.trim())
-      .filter(Boolean);
-
   carPhotos.forEach((photo, photoIndex) => {
-    const sources = parseList(photo.dataset.gallery, ",");
+    const sources = parseDelimitedList(photo.dataset.gallery, ",");
     if (sources.length < 2) return;
 
     const card = photo.closest(".car, .crew-card");
@@ -122,7 +137,7 @@
     }
     const cardId = card.dataset.cardId;
 
-    const alts = parseList(photo.dataset.galleryAlts, "|");
+    const alts = parseDelimitedList(photo.dataset.galleryAlts, "|");
     const placeholder = photo.querySelector("span");
     if (placeholder) placeholder.remove();
 
@@ -176,17 +191,9 @@
         return;
       }
 
-      img.classList.add("is-fading");
-      window.setTimeout(() => {
+      runFadeSwap(img, "is-fading", 120, () => {
         applySlide();
-        const clearFade = () => img.classList.remove("is-fading");
-        if (img.complete) {
-          window.requestAnimationFrame(clearFade);
-        } else {
-          img.addEventListener("load", clearFade, { once: true });
-          window.setTimeout(clearFade, 280);
-        }
-      }, 120);
+      });
     };
 
     fleetGalleryControllers.set(cardId, {
@@ -227,18 +234,12 @@
 
   if (!fleetRoot || fleetCards.length === 0) return;
 
-  const parseList = (value, separator) =>
-    (value || "")
-      .split(separator)
-      .map((item) => item.trim())
-      .filter(Boolean);
-
   const extractCardData = (card) => {
     const photo = card.querySelector(".car-photo");
     const fallbackSrc = photo?.querySelector("img")?.getAttribute("src") || "";
     const fallbackAlt = photo?.querySelector("img")?.getAttribute("alt") || "Carro da frota";
-    const gallery = parseList(photo?.dataset.gallery, ",");
-    const galleryAlts = parseList(photo?.dataset.galleryAlts, "|");
+    const gallery = parseDelimitedList(photo?.dataset.gallery, ",");
+    const galleryAlts = parseDelimitedList(photo?.dataset.galleryAlts, "|");
     const activeIndex = Number.parseInt(photo?.dataset.activeIndex || "0", 10);
     const normalizedGallery = gallery.length > 0 ? gallery : fallbackSrc ? [fallbackSrc] : [];
 
@@ -415,15 +416,11 @@
     const gallerySize = activeCard?.gallery?.length || 0;
     if (gallerySize <= 1) return;
 
-    media.classList.add("is-fading");
-    window.setTimeout(() => {
+    runFadeSwap(media, "is-fading", 120, () => {
       const next = resolver(activeImageIndex, gallerySize);
       activeImageIndex = (next + gallerySize) % gallerySize;
       renderOverlay();
-      window.requestAnimationFrame(() => {
-        window.setTimeout(() => media.classList.remove("is-fading"), 16);
-      });
-    }, 120);
+    });
   };
 
   overlay.addEventListener("click", closeOverlay);
@@ -459,12 +456,6 @@
   const projectRoot = document.getElementById("project-focus-root");
   const projectCards = Array.from(document.querySelectorAll(".project-card[data-gallery]"));
   if (!projectRoot || projectCards.length === 0) return;
-
-  const parseList = (value, separator) =>
-    (value || "")
-      .split(separator)
-      .map((item) => item.trim())
-      .filter(Boolean);
 
   const overlay = document.createElement("div");
   overlay.className = "project-focus-overlay";
@@ -609,21 +600,17 @@
   const changeSlide = (resolver) => {
     const size = activeData?.gallery?.length || 0;
     if (size <= 1) return;
-    media.classList.add("is-fading");
-    window.setTimeout(() => {
+    runFadeSwap(media, "is-fading", 110, () => {
       const nextIndex = resolver(activeIndex, size);
       activeIndex = (nextIndex + size) % size;
       render();
-      window.requestAnimationFrame(() => {
-        window.setTimeout(() => media.classList.remove("is-fading"), 16);
-      });
-    }, 110);
+    });
   };
 
   projectCards.forEach((el) => {
-    const gallery = parseList(el.dataset.gallery, ",");
+    const gallery = parseDelimitedList(el.dataset.gallery, ",");
     if (gallery.length === 0) return;
-    const alts = parseList(el.dataset.galleryAlts, "|");
+    const alts = parseDelimitedList(el.dataset.galleryAlts, "|");
     const rentLabel = el.dataset.rentLabel || "Disponivel sob consulta.";
     const rentUrl = el.dataset.rentUrl || "";
 
@@ -655,7 +642,10 @@
       rentLabel,
       rentUrl,
     };
-    el.addEventListener("click", () => open(data));
+    el.addEventListener("click", (event) => {
+      if (event.target.closest("a, button")) return;
+      open(data);
+    });
   });
 
   closeButton.addEventListener("click", close);
@@ -706,6 +696,118 @@
 })();
 
 (() => {
+  const carouselContainers = Array.from(
+    document.querySelectorAll(".fleet, .grid, .projects-grid, .crew-grid, .service-widgets")
+  );
+  if (carouselContainers.length === 0) return;
+
+  const isMobileViewport = window.matchMedia("(max-width: 720px)");
+  const setups = [];
+
+  carouselContainers.forEach((container) => {
+    const cards = Array.from(container.children).filter((element) =>
+      element.matches(".car, .card, .project-card, .crew-card, .service-widget")
+    );
+    if (cards.length <= 1) return;
+
+    const dots = document.createElement("div");
+    dots.className = "mobile-carousel-dots";
+    dots.setAttribute("aria-hidden", "true");
+
+    let activeIndex = 0;
+    let ticking = false;
+
+    const dotButtons = cards.map((_, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "mobile-carousel-dot";
+      dot.setAttribute("aria-label", `Ir para card ${index + 1}`);
+      dots.appendChild(dot);
+      return dot;
+    });
+
+    const setActiveDot = (index) => {
+      if (index === activeIndex) return;
+      activeIndex = index;
+      dotButtons.forEach((button, buttonIndex) => {
+        button.classList.toggle("is-active", buttonIndex === activeIndex);
+      });
+    };
+
+    const getClosestCardIndex = () => {
+      const containerCenter = container.scrollLeft + container.clientWidth / 2;
+      let closestIndex = 0;
+      let smallestDistance = Number.POSITIVE_INFINITY;
+
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const distance = Math.abs(cardCenter - containerCenter);
+        if (distance < smallestDistance) {
+          smallestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      return closestIndex;
+    };
+
+    const updateDotVisibility = () => {
+      const hasOverflow = container.scrollWidth - container.clientWidth > 8;
+      const shouldShow = isMobileViewport.matches && hasOverflow;
+
+      dots.classList.toggle("is-visible", shouldShow);
+      dots.setAttribute("aria-hidden", String(!shouldShow));
+
+      if (shouldShow) {
+        setActiveDot(getClosestCardIndex());
+      }
+    };
+
+    const onScroll = () => {
+      if (!dots.classList.contains("is-visible")) return;
+      if (ticking) return;
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        ticking = false;
+        setActiveDot(getClosestCardIndex());
+      });
+    };
+
+    dotButtons.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        cards[index].scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      });
+    });
+
+    container.insertAdjacentElement("afterend", dots);
+    dotButtons[0].classList.add("is-active");
+    container.addEventListener("scroll", onScroll, { passive: true });
+    setups.push(updateDotVisibility);
+  });
+
+  if (setups.length === 0) return;
+
+  const refreshAll = () => {
+    setups.forEach((refresh) => refresh());
+  };
+
+  if (typeof isMobileViewport.addEventListener === "function") {
+    isMobileViewport.addEventListener("change", refreshAll);
+  } else if (typeof isMobileViewport.addListener === "function") {
+    isMobileViewport.addListener(refreshAll);
+  }
+
+  window.addEventListener("resize", refreshAll);
+  window.addEventListener("load", refreshAll);
+  refreshAll();
+})();
+
+(() => {
   const agendaLists = Array.from(document.querySelectorAll(".agenda-block .agenda-list"));
   if (agendaLists.length === 0) return;
 
@@ -743,3 +845,4 @@
     render();
   });
 })();
+

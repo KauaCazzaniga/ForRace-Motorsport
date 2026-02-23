@@ -76,8 +76,8 @@
   }
 
   .crew-grid > .crew-card {
-    flex: 0 0 60%;
-    max-width: 60%;
+    flex: 0 0 100%;
+    max-width: 100%;
     scroll-snap-align: center;
     scroll-snap-stop: always;
     transition: transform 0.35s ease, opacity 0.35s ease;

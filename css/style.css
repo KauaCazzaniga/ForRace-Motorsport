@@ -657,6 +657,10 @@
       border-color: var(--accent-2);
     }
 
+    .mobile-carousel-dots {
+      display: none;
+    }
+
     .tag {
       display: inline-block;
       font-size: 12px;
@@ -1026,11 +1030,39 @@
 
       .fleet > .car,
       .grid > .card {
-        flex: 0 0 60%;
-        max-width: 60%;
+        flex: 0 0 100%;
+        max-width: 100%;
         scroll-snap-align: center;
         scroll-snap-stop: always;
         transition: transform 0.35s ease, opacity 0.35s ease;
+      }
+
+      .mobile-carousel-dots {
+        margin: 6px 0 14px;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mobile-carousel-dots.is-visible {
+        display: flex;
+      }
+
+      .mobile-carousel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(244, 242, 237, 0.45);
+        background: rgba(244, 242, 237, 0.2);
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+      }
+
+      .mobile-carousel-dot.is-active {
+        background: var(--accent-2);
+        border-color: var(--accent-2);
+        transform: scale(1.25);
       }
 
       .car {
@@ -1061,10 +1093,7 @@
       }
 
       .fleet .car-photo {
-        height: auto;
-        min-height: 0;
         height: 200px;
-        aspect-ratio: auto;
       }
 
       .fleet .car-photo img {

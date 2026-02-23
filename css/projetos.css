@@ -88,34 +88,6 @@
   color: var(--accent-2);
 }
 
-.project-rent-preview p {
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.project-rent-preview .project-rent-link {
-  min-height: 34px;
-  border-radius: 999px;
-  border: 1px solid rgba(240, 74, 58, 0.55);
-  background: rgba(240, 74, 58, 0.15);
-  color: var(--ink);
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.8px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.project-rent-preview .project-rent-link.is-disabled {
-  border-color: rgba(244, 242, 237, 0.2);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(244, 242, 237, 0.58);
-  pointer-events: none;
-}
-
 .service-widgets {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -380,8 +352,8 @@
 
   .projects-grid > .project-card,
   .service-widgets > .service-widget {
-    flex: 0 0 60%;
-    max-width: 60%;
+    flex: 0 0 100%;
+    max-width: 100%;
     scroll-snap-align: center;
     scroll-snap-stop: always;
     transition: transform 0.35s ease, opacity 0.35s ease;
@@ -394,8 +366,8 @@
   }
 
   .service-widgets > .service-widget {
-    flex: 0 1 min(620px, 100%);
-    max-width: min(620px, 100%);
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 
   .project-card,

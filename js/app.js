@@ -614,23 +614,21 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     const rentLabel = el.dataset.rentLabel || "Disponivel sob consulta.";
     const rentUrl = el.dataset.rentUrl || "";
 
-    if (rentUrl) {
-      const preview = document.createElement("div");
-      preview.className = "project-rent-preview";
+    const preview = document.createElement("div");
+    preview.className = "project-rent-preview";
 
-      const previewTitle = document.createElement("h4");
-      previewTitle.textContent = "Aluga-se";
-      preview.append(previewTitle);
-      const summaryElement = el.querySelector("p");
-      if (summaryElement) {
-        summaryElement.insertAdjacentElement("afterend", preview);
+    const previewTitle = document.createElement("h4");
+    previewTitle.textContent = rentUrl ? "Aluga-se" : "Indisponivel";
+    preview.append(previewTitle);
+    const summaryElement = el.querySelector("p");
+    if (summaryElement) {
+      summaryElement.insertAdjacentElement("afterend", preview);
+    } else {
+      const titleElement = el.querySelector("h3");
+      if (titleElement) {
+        titleElement.insertAdjacentElement("afterend", preview);
       } else {
-        const titleElement = el.querySelector("h3");
-        if (titleElement) {
-          titleElement.insertAdjacentElement("afterend", preview);
-        } else {
-          el.appendChild(preview);
-        }
+        el.appendChild(preview);
       }
     }
 

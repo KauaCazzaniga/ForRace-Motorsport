@@ -326,8 +326,6 @@
 
 .project-rent-widget .cta {
   padding: 10px 16px;
-  margin: 0 auto;
-  display: inline-flex;
 }
 
 @media (max-width: 720px) {

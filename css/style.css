@@ -694,12 +694,6 @@
       gap: 10px;
     }
 
-    .car-actions > .car-action:only-child {
-      grid-column: 1 / -1;
-      justify-self: center;
-      width: min(100%, 220px);
-    }
-
     .car-action {
       min-height: 38px;
       border-radius: 10px;

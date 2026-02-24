@@ -233,9 +233,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   const fleetCards = Array.from(document.querySelectorAll(".fleet .car"));
 
   if (!fleetRoot || fleetCards.length === 0) return;
-  fleetCards.forEach((card, index) => {
-    card.dataset.fleetIndex = String(index);
-  });
 
   const extractCardData = (card) => {
     const photo = card.querySelector(".car-photo");
@@ -247,7 +244,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     const normalizedGallery = gallery.length > 0 ? gallery : fallbackSrc ? [fallbackSrc] : [];
 
     return {
-      fleetIndex: Number.parseInt(card.dataset.fleetIndex || "0", 10),
       cardId: card.dataset.cardId || "",
       imageSrc: fallbackSrc,
       imageAlt: fallbackAlt,
@@ -263,7 +259,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   const enterDelayMs = 35;
   const hideDelayMs = 360;
   let activeCard = null;
-  let activeFleetIndex = 0;
   let activeImageIndex = 0;
   let isMounted = false;
   let showTimer = null;
@@ -395,7 +390,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     const data = extractCardData(card);
     const maxIndex = Math.max((data.gallery?.length || 1) - 1, 0);
     activeCard = data;
-    activeFleetIndex = Number.isFinite(data.fleetIndex) ? data.fleetIndex : 0;
     activeImageIndex = Math.min(Math.max(data.activeIndex, 0), maxIndex);
     renderOverlay();
 
@@ -428,58 +422,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
       renderOverlay();
     });
   };
-
-  const changeOverlayCard = (resolver) => {
-    if (fleetCards.length <= 1) return;
-    syncCardSelection(activeCard, activeImageIndex);
-
-    runFadeSwap(media, "is-fading", 120, () => {
-      const nextCardIndex = resolver(activeFleetIndex, fleetCards.length);
-      activeFleetIndex = (nextCardIndex + fleetCards.length) % fleetCards.length;
-      const nextData = extractCardData(fleetCards[activeFleetIndex]);
-      const maxIndex = Math.max((nextData.gallery?.length || 1) - 1, 0);
-      activeCard = nextData;
-      activeImageIndex = Math.min(Math.max(nextData.activeIndex, 0), maxIndex);
-      renderOverlay();
-    });
-  };
-
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchActive = false;
-  const swipeThresholdPx = 52;
-  cardEl.addEventListener(
-    "touchstart",
-    (event) => {
-      if (!isMounted || !activeCard) return;
-      if (event.touches.length !== 1) return;
-      const touch = event.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchActive = true;
-    },
-    { passive: true }
-  );
-  cardEl.addEventListener(
-    "touchend",
-    (event) => {
-      if (!touchActive || !isMounted || !activeCard) return;
-      const touch = event.changedTouches[0];
-      const deltaX = touch.clientX - touchStartX;
-      const deltaY = touch.clientY - touchStartY;
-      touchActive = false;
-
-      if (Math.abs(deltaX) < swipeThresholdPx) return;
-      if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
-
-      if (deltaX < 0) {
-        changeOverlayCard((index, size) => (index + 1) % size);
-      } else {
-        changeOverlayCard((index, size) => (index - 1 + size) % size);
-      }
-    },
-    { passive: true }
-  );
 
   overlay.addEventListener("click", closeOverlay);
   cardEl.addEventListener("click", (event) => event.stopPropagation());
@@ -514,7 +456,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   const projectRoot = document.getElementById("project-focus-root");
   const projectCards = Array.from(document.querySelectorAll(".project-card[data-gallery]"));
   if (!projectRoot || projectCards.length === 0) return;
-  const projectEntries = [];
 
   const overlay = document.createElement("div");
   overlay.className = "project-focus-overlay";
@@ -581,7 +522,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   projectRoot.appendChild(overlay);
 
   let activeData = null;
-  let activeProjectIndex = -1;
   let activeIndex = 0;
 
   const renderDots = () => {
@@ -641,10 +581,8 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     renderDots();
   };
 
-  const open = (projectIndex) => {
-    if (projectIndex < 0 || projectIndex >= projectEntries.length) return;
-    activeProjectIndex = projectIndex;
-    activeData = projectEntries[activeProjectIndex];
+  const open = (data) => {
+    activeData = data;
     activeIndex = 0;
     render();
     overlay.style.display = "grid";
@@ -656,7 +594,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     window.setTimeout(() => {
       overlay.style.display = "none";
       activeData = null;
-      activeProjectIndex = -1;
     }, 280);
   };
 
@@ -670,24 +607,12 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     });
   };
 
-  const changeProject = (resolver) => {
-    if (projectEntries.length <= 1) return;
-    runFadeSwap(media, "is-fading", 120, () => {
-      const nextProjectIndex = resolver(activeProjectIndex, projectEntries.length);
-      activeProjectIndex = (nextProjectIndex + projectEntries.length) % projectEntries.length;
-      activeData = projectEntries[activeProjectIndex];
-      activeIndex = 0;
-      render();
-    });
-  };
-
   projectCards.forEach((el) => {
     const gallery = parseDelimitedList(el.dataset.gallery, ",");
     if (gallery.length === 0) return;
     const alts = parseDelimitedList(el.dataset.galleryAlts, "|");
     const rentLabel = el.dataset.rentLabel || "Disponivel sob consulta.";
     const rentUrl = el.dataset.rentUrl || "";
-    const projectIndex = projectEntries.length;
 
     if (rentUrl) {
       const preview = document.createElement("div");
@@ -719,49 +644,11 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
       rentLabel,
       rentUrl,
     };
-    projectEntries.push(data);
     el.addEventListener("click", (event) => {
       if (event.target.closest("a, button")) return;
-      open(projectIndex);
+      open(data);
     });
   });
-
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchActive = false;
-  const swipeThresholdPx = 52;
-  card.addEventListener(
-    "touchstart",
-    (event) => {
-      if (!activeData) return;
-      if (event.touches.length !== 1) return;
-      const touch = event.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchActive = true;
-    },
-    { passive: true }
-  );
-  card.addEventListener(
-    "touchend",
-    (event) => {
-      if (!touchActive || !activeData) return;
-      const touch = event.changedTouches[0];
-      const deltaX = touch.clientX - touchStartX;
-      const deltaY = touch.clientY - touchStartY;
-      touchActive = false;
-
-      if (Math.abs(deltaX) < swipeThresholdPx) return;
-      if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
-
-      if (deltaX < 0) {
-        changeProject((index, size) => (index + 1) % size);
-      } else {
-        changeProject((index, size) => (index - 1 + size) % size);
-      }
-    },
-    { passive: true }
-  );
 
   closeButton.addEventListener("click", close);
   overlay.addEventListener("click", close);

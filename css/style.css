@@ -22,6 +22,11 @@
       letter-spacing: 0.4px;
     }
 
+    body.is-overlay-open .mobile-quick-nav {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     .wrap {
       max-width: 1100px;
       margin: 0 auto;
@@ -335,9 +340,10 @@
     .fleet-focus-overlay {
       position: fixed;
       inset: 0;
-      z-index: 1200;
+      z-index: 2100;
       display: grid;
       place-items: center;
+      gap: 20px;
       padding: 24px;
       background: rgba(3, 4, 6, 0.8);
       backdrop-filter: blur(8px);
@@ -356,9 +362,13 @@
 
     .fleet-focus-card {
       position: relative;
-      width: min(980px, 96vw);
-      max-height: 92vh;
+      width: min(900px, 92vw);
+      max-height: 90vh;
       overflow: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
       border-radius: 26px;
       border: 1px solid rgba(240, 74, 58, 0.75);
       background: linear-gradient(155deg, rgba(15, 18, 23, 0.98), rgba(11, 13, 16, 0.98));
@@ -368,6 +378,30 @@
       transform: translateY(34px) scale(0.955);
       transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
                   box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(244, 242, 237, 0.34) transparent;
+    }
+
+    .fleet-focus-card::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .fleet-focus-card::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .fleet-focus-card::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(244, 242, 237, 0.3);
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    .fleet-focus-card::-webkit-scrollbar-thumb:hover {
+      background: rgba(247, 197, 72, 0.5);
+      border: 2px solid transparent;
+      background-clip: content-box;
     }
 
     .fleet-focus-overlay.is-visible .fleet-focus-card {
@@ -450,6 +484,37 @@
     .fleet-focus-dot.is-active {
       border-color: var(--accent-2);
       background: var(--accent-2);
+    }
+
+    .fleet-focus-card-dots {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.16);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(15, 18, 23, 0.72));
+      box-shadow: 0 14px 26px -22px rgba(0, 0, 0, 0.82);
+    }
+
+    .fleet-focus-card-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 237, 0.45);
+      background: rgba(244, 242, 237, 0.2);
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s ease, width 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .fleet-focus-card-dot.is-active {
+      border-color: var(--accent-2);
+      background: var(--accent-2);
+      width: 22px;
+      box-shadow: 0 0 0 4px rgba(247, 197, 72, 0.2);
     }
 
     .fleet-focus-content {
@@ -940,6 +1005,10 @@
     }
 
     @media (max-width: 720px) {
+      .wrap {
+        padding: 0 14px 56px;
+      }
+
       nav {
         display: none;
       }
@@ -1132,12 +1201,19 @@
       }
 
       .fleet-focus-overlay {
-        padding: 10px;
+        gap: 18px;
+        padding: 12px;
+        place-items: center;
       }
 
       .fleet-focus-card {
-        width: 100%;
-        max-height: 94vh;
+        width: min(94vw, 620px);
+        max-height: calc(100vh - 88px);
+        max-height: calc(100svh - 88px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 auto;
         border-radius: 18px;
       }
 
@@ -1162,6 +1238,11 @@
 
       .fleet-focus-title {
         font-size: clamp(24px, 7vw, 34px);
+      }
+
+      .fleet-focus-card-dots {
+        margin-top: 10px;
+        padding: 7px 11px;
       }
     }
 .logo-title {

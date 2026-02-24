@@ -19,6 +19,55 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   }, swapDelayMs);
 };
 
+const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
+  let startX = null;
+  let startY = null;
+
+  const reset = () => {
+    startX = null;
+    startY = null;
+  };
+
+  element.addEventListener(
+    "touchstart",
+    (event) => {
+      const touch = event.changedTouches?.[0];
+      if (!touch) return;
+      startX = touch.clientX;
+      startY = touch.clientY;
+    },
+    { passive: true }
+  );
+
+  element.addEventListener(
+    "touchend",
+    (event) => {
+      if (startX === null || startY === null) return;
+      const touch = event.changedTouches?.[0];
+      if (!touch) {
+        reset();
+        return;
+      }
+
+      const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+      reset();
+
+      if (Math.abs(deltaX) < 44) return;
+      if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return;
+
+      if (deltaX < 0) {
+        onSwipeLeft();
+        return;
+      }
+      onSwipeRight();
+    },
+    { passive: true }
+  );
+
+  element.addEventListener("touchcancel", reset, { passive: true });
+};
+
 (() => {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const topGap = 18;
@@ -198,7 +247,6 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
 
     fleetGalleryControllers.set(cardId, {
       setSlide,
-      getCurrentIndex: () => currentIndex,
     });
 
     const stopCardClick = (event) => {
@@ -259,6 +307,7 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   const enterDelayMs = 35;
   const hideDelayMs = 360;
   let activeCard = null;
+  let activeCardIndex = 0;
   let activeImageIndex = 0;
   let isMounted = false;
   let showTimer = null;
@@ -330,6 +379,8 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
 
   const dots = document.createElement("div");
   dots.className = "fleet-focus-dots";
+  const cardDots = document.createElement("div");
+  cardDots.className = "fleet-focus-card-dots";
 
   const content = document.createElement("div");
   content.className = "fleet-focus-content";
@@ -342,7 +393,7 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
 
   content.append(tag, title, copy);
   cardEl.append(closeButton, media, prevButton, nextButton, dots, content);
-  overlay.appendChild(cardEl);
+  overlay.append(cardEl, cardDots);
   fleetRoot.appendChild(overlay);
 
   const updateDots = () => {
@@ -360,6 +411,27 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
         changeOverlaySlide(() => i);
       });
       dots.appendChild(dot);
+    }
+  };
+
+  const updateCardDots = () => {
+    cardDots.innerHTML = "";
+    if (fleetCards.length <= 1) {
+      cardDots.style.display = "none";
+      return;
+    }
+
+    cardDots.style.display = "flex";
+    for (let i = 0; i < fleetCards.length; i += 1) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = `fleet-focus-card-dot ${i === activeCardIndex ? "is-active" : ""}`;
+      dot.setAttribute("aria-label", `Ir para carro ${i + 1}`);
+      dot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        changeFocusedCard(() => i);
+      });
+      cardDots.appendChild(dot);
     }
   };
 
@@ -385,13 +457,41 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     updateDots();
   };
 
-  const openOverlay = (card) => {
-    clearTimers();
-    const data = extractCardData(card);
+  const setActiveCard = (nextCardIndex, shouldSyncCurrent = true) => {
+    if (fleetCards.length === 0) return;
+    const normalizedIndex = ((nextCardIndex % fleetCards.length) + fleetCards.length) % fleetCards.length;
+
+    if (shouldSyncCurrent && activeCard) {
+      syncCardSelection(activeCard, activeImageIndex);
+    }
+
+    const data = extractCardData(fleetCards[normalizedIndex]);
     const maxIndex = Math.max((data.gallery?.length || 1) - 1, 0);
     activeCard = data;
+    activeCardIndex = normalizedIndex;
     activeImageIndex = Math.min(Math.max(data.activeIndex, 0), maxIndex);
     renderOverlay();
+    updateCardDots();
+    cardEl.scrollTop = 0;
+  };
+
+  const changeFocusedCard = (resolver) => {
+    if (fleetCards.length <= 1) return;
+    const nextCardIndex = resolver(activeCardIndex, fleetCards.length);
+    const normalizedIndex = ((nextCardIndex % fleetCards.length) + fleetCards.length) % fleetCards.length;
+    if (normalizedIndex === activeCardIndex) return;
+
+    runFadeSwap(media, "is-fading", 120, () => {
+      setActiveCard(normalizedIndex);
+    });
+  };
+
+  const openOverlay = (cardIndex) => {
+    clearTimers();
+    setActiveCard(cardIndex, false);
+    overlay.scrollTop = 0;
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("is-overlay-open");
 
     isMounted = true;
     overlay.style.display = "grid";
@@ -407,6 +507,8 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     overlay.classList.remove("is-visible");
     hideTimer = window.setTimeout(() => {
       overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("is-overlay-open");
       activeCard = null;
       isMounted = false;
     }, hideDelayMs);
@@ -423,7 +525,10 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     });
   };
 
-  overlay.addEventListener("click", closeOverlay);
+  overlay.addEventListener("click", (event) => {
+    if (event.target !== overlay) return;
+    closeOverlay();
+  });
   cardEl.addEventListener("click", (event) => event.stopPropagation());
   closeButton.addEventListener("click", closeOverlay);
   prevButton.addEventListener("click", (event) => {
@@ -435,10 +540,16 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     changeOverlaySlide((index, size) => (index + 1) % size);
   });
 
-  fleetCards.forEach((card) => {
+  bindHorizontalSwipe(
+    cardEl,
+    () => changeFocusedCard((index, size) => (index + 1) % size),
+    () => changeFocusedCard((index, size) => (index - 1 + size) % size)
+  );
+
+  fleetCards.forEach((card, cardIndex) => {
     card.addEventListener("click", (event) => {
       if (event.target.closest("a, button")) return;
-      openOverlay(card);
+      openOverlay(cardIndex);
     });
   });
 
@@ -491,6 +602,8 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
 
   const dots = document.createElement("div");
   dots.className = "project-focus-dots";
+  const cardDots = document.createElement("div");
+  cardDots.className = "project-focus-card-dots";
   mediaWrap.append(media, prevButton, nextButton, dots);
 
   const content = document.createElement("div");
@@ -518,10 +631,12 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
 
   content.append(tag, title, shortCopy, detailCopy, rentWidget);
   card.append(closeButton, mediaWrap, content);
-  overlay.appendChild(card);
+  overlay.append(card, cardDots);
   projectRoot.appendChild(overlay);
 
+  const projectDataList = [];
   let activeData = null;
+  let activeCardIndex = 0;
   let activeIndex = 0;
 
   const renderDots = () => {
@@ -538,6 +653,27 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
         changeSlide(() => i);
       });
       dots.appendChild(dot);
+    }
+  };
+
+  const renderCardDots = () => {
+    cardDots.innerHTML = "";
+    if (projectDataList.length <= 1) {
+      cardDots.style.display = "none";
+      return;
+    }
+
+    cardDots.style.display = "flex";
+    for (let i = 0; i < projectDataList.length; i += 1) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = `project-focus-card-dot ${i === activeCardIndex ? "is-active" : ""}`;
+      dot.setAttribute("aria-label", `Ir para projeto ${i + 1}`);
+      dot.addEventListener("click", (event) => {
+        event.stopPropagation();
+        changeFocusedProjectCard(() => i);
+      });
+      cardDots.appendChild(dot);
     }
   };
 
@@ -581,10 +717,33 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     renderDots();
   };
 
-  const open = (data) => {
-    activeData = data;
+  const setActiveProjectCard = (nextCardIndex) => {
+    if (projectDataList.length === 0) return;
+    const normalizedIndex = ((nextCardIndex % projectDataList.length) + projectDataList.length) % projectDataList.length;
+    activeCardIndex = normalizedIndex;
+    activeData = projectDataList[normalizedIndex];
     activeIndex = 0;
     render();
+    renderCardDots();
+    card.scrollTop = 0;
+  };
+
+  const changeFocusedProjectCard = (resolver) => {
+    if (!activeData || projectDataList.length <= 1) return;
+    const nextCardIndex = resolver(activeCardIndex, projectDataList.length);
+    const normalizedIndex = ((nextCardIndex % projectDataList.length) + projectDataList.length) % projectDataList.length;
+    if (normalizedIndex === activeCardIndex) return;
+
+    runFadeSwap(media, "is-fading", 110, () => {
+      setActiveProjectCard(normalizedIndex);
+    });
+  };
+
+  const open = (cardIndex) => {
+    setActiveProjectCard(cardIndex);
+    overlay.scrollTop = 0;
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("is-overlay-open");
     overlay.style.display = "grid";
     window.setTimeout(() => overlay.classList.add("is-visible"), 20);
   };
@@ -593,6 +752,8 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     overlay.classList.remove("is-visible");
     window.setTimeout(() => {
       overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("is-overlay-open");
       activeData = null;
     }, 280);
   };
@@ -642,14 +803,19 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
       rentLabel,
       rentUrl,
     };
+    const cardIndex = projectDataList.length;
+    projectDataList.push(data);
     el.addEventListener("click", (event) => {
       if (event.target.closest("a, button")) return;
-      open(data);
+      open(cardIndex);
     });
   });
 
   closeButton.addEventListener("click", close);
-  overlay.addEventListener("click", close);
+  overlay.addEventListener("click", (event) => {
+    if (event.target !== overlay) return;
+    close();
+  });
   card.addEventListener("click", (event) => event.stopPropagation());
   prevButton.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -659,6 +825,12 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
     event.stopPropagation();
     changeSlide((index, size) => (index + 1) % size);
   });
+
+  bindHorizontalSwipe(
+    card,
+    () => changeFocusedProjectCard((index, size) => (index + 1) % size),
+    () => changeFocusedProjectCard((index, size) => (index - 1 + size) % size)
+  );
 
   document.addEventListener("keydown", (event) => {
     if (!activeData) return;

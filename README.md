@@ -5,15 +5,14 @@ Site institucional da ForRace Motorsport com foco em apresentacao da equipe, fro
 ## Demo
 
 - Repositorio: `https://github.com/KauaCazzaniga/ForRace-Motorsport.git`
-- Site: `https://kauacazzaniga.github.io/ForRace-Motorsport/`
-- Projetos: `https://kauacazzaniga.github.io/ForRace-Motorsport/projetos.html`
+- Site: `https:/forrace-motorsport.com.br'
 
 ## Funcionalidades
 
 - Landing page responsiva em HTML, CSS e JavaScript
-- Secoes de frota, historia, base/cultura e agenda
+- Seções de frota, história, contato, localização, pilotos e projetos.
 - Navegacao suave entre secoes
-- Efeitos visuais de destaque nos cards ao passar o mouse
+- Efeitos visuais de destaque nos cards ao passar o mouse/ click 
 - Secao de localizacao com endereco e mapa incorporado
 - Links diretos para WhatsApp e Instagram
 
@@ -41,13 +40,3 @@ Site institucional da ForRace Motorsport com foco em apresentacao da equipe, fro
    cd ForRace-Motorsport
    ```
 3. Abra o `index.html` no navegador.
-
-## Publicacao
-
-Para publicar via GitHub Pages:
-
-1. Acesse `Settings` -> `Pages` no repositorio.
-2. Em `Build and deployment`, selecione:
-   - `Source`: `Deploy from a branch`
-   - `Branch`: `main`
-   - `Folder`: `/ (root)`

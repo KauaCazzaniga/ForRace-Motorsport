@@ -626,7 +626,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   rentCta.href = "https://wa.me/5511945339281";
   rentCta.target = "_blank";
   rentCta.rel = "noopener";
-  rentCta.textContent = "Consultar disponibilidade";
+  rentCta.textContent = "Consultar disponibilidade";1
   rentWidget.append(rentTitle, rentText, rentCta);
 
   content.append(tag, title, shortCopy, detailCopy, rentWidget);

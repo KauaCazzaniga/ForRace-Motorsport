@@ -1,62 +1,91 @@
-<!doctype html>
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <title>Page Not Found</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erro 404 - Fora da Pista | ForRace Motorsport</title>
   <style>
+    /* Reset básico */
     * {
-      line-height: 1.2;
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    html {
-      color: #888;
-      display: table;
-      font-family: sans-serif;
+    body, html {
       height: 100%;
+      background-color: #121212;
+      font-family: 'Arial', sans-serif;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      width: 100%;
     }
 
-    body {
-      display: table-cell;
-      vertical-align: middle;
-      margin: 2em auto;
+
+    .container-404 {
+      max-width: 600px;
+      padding: 20px;
     }
 
-    h1 {
-      color: #555;
-      font-size: 2em;
-      font-weight: 400;
+    .erro-codigo {
+      font-size: 8rem;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-style: italic;
+      color: #f04e30;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 10px rgba(240, 78, 48, 0.3);
     }
 
-    p {
-      margin: 0 auto;
-      width: 280px;
+    /* Subtítulo */
+    .erro-titulo {
+      font-size: 2.5rem;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-style: italic;
+      text-transform: uppercase;
+      margin-bottom: 20px;
     }
 
-    @media only screen and (max-width: 280px) {
 
-      body,
-      p {
-        width: 95%;
-      }
+    .erro-texto {
+      font-size: 1.1rem;
+      color: #b0b0b0;
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
 
-      h1 {
-        font-size: 1.5em;
-        margin: 0 0 0.3em;
-      }
 
+    .btn-voltar {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: #f04e30;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      border-radius: 25px;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    /* Efeito ao passar o mouse no botão */
+    .btn-voltar:hover {
+      background-color: #d03d24; /* Um tom um pouco mais escuro para o hover */
+      transform: scale(1.05); /* Leve aumento para dar sensação de clique */
     }
   </style>
 </head>
-
 <body>
-  <h1>Page Not Found</h1>
-  <p>Sorry, but the page you were trying to view does not exist.</p>
-</body>
 
+<div class="container-404">
+  <h1 class="erro-codigo">404</h1>
+  <h2 class="erro-titulo">Saímos da pista!</h2>
+  <p class="erro-texto">Parece que você espalhou demais na curva e fomos parar na brita. A página que você procura não existe ou foi movida para outro traçado.</p>
+  <a href="/" class="btn-voltar">Voltar para o Box</a>
+</div>
+
+</body>
 </html>
-<!-- IE needs 512+ bytes: https://docs.microsoft.com/archive/blogs/ieinternals/friendly-http-error-pages -->

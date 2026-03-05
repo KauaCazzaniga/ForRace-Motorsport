@@ -4,21 +4,6 @@ const parseDelimitedList = (value, separator) =>
     .split(separator)
     .map((item) => item.trim())
     .filter(Boolean);
-
-const lockBodyScroll = () => {
-  const scrollY = window.scrollY || window.pageYOffset || 0;
-  document.body.dataset.scrollLock = String(scrollY);
-  document.body.style.top = `-${scrollY}px`;
-  document.body.classList.add("is-overlay-open");
-};
-
-const unlockBodyScroll = () => {
-  const scrollY = Number.parseInt(document.body.dataset.scrollLock || "0", 10) || 0;
-  document.body.classList.remove("is-overlay-open");
-  document.body.style.top = "";
-  document.body.removeAttribute("data-scroll-lock");
-  window.scrollTo(0, scrollY);
-};
 const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
   element.classList.add(fadeClassName);
   window.setTimeout(() => {
@@ -507,7 +492,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     setActiveCard(cardIndex, false);
     overlay.scrollTop = 0;
     overlay.setAttribute("aria-hidden", "false");
-    lockBodyScroll();
+    document.body.classList.add("is-overlay-open");
 
     isMounted = true;
     overlay.style.display = "grid";
@@ -524,7 +509,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     hideTimer = window.setTimeout(() => {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
-      unlockBodyScroll();
+      document.body.classList.remove("is-overlay-open");
       activeCard = null;
       isMounted = false;
     }, hideDelayMs);
@@ -592,6 +577,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   const card = document.createElement("article");
   card.className = "project-focus-card";
   card.style.position = "relative";
+  card.style.touchAction = "pan-x";
 
   const closeButton = document.createElement("button");
   closeButton.type = "button";
@@ -855,6 +841,10 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   };
 
   const open = (cardIndex, trackIndex = null) => {
+    if (window.matchMedia && window.matchMedia("(max-width: 720px)").matches) {
+      overlay.style.touchAction = "pan-x";
+      card.style.touchAction = "pan-x";
+    }
     setActiveProjectCard(cardIndex);
     if (Number.isFinite(trackIndex)) {
       activeView = "track";
@@ -863,7 +853,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     }
     overlay.scrollTop = 0;
     overlay.setAttribute("aria-hidden", "false");
-    lockBodyScroll();
+    document.body.classList.add("is-overlay-open");
     overlay.style.display = "grid";
     window.setTimeout(() => overlay.classList.add("is-visible"), 20);
   };
@@ -873,7 +863,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     window.setTimeout(() => {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
-      unlockBodyScroll();
+      document.body.classList.remove("is-overlay-open");
       activeData = null;
     }, 280);
   };

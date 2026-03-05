@@ -444,12 +444,22 @@
   bottom: 14px;
   transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  gap: 6px;
+}
+
+.project-focus-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 242, 237, 0.45);
+  background: rgba(244, 242, 237, 0.2);
+  padding: 0;
 }
 
 .project-focus-dot.is-active {
   background: var(--accent-2);
   border-color: var(--accent-2);
+  transform: scale(1.2);
 }
 
 .project-focus-card-dots {
@@ -460,21 +470,29 @@
   transform: translateX(-50%);
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 0;
-  padding: 8px 12px;
+  padding: 0;
   border-radius: 999px;
-  border: 1px solid rgba(244, 242, 237, 0.16);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(15, 18, 23, 0.72));
-  box-shadow: 0 14px 26px -22px rgba(0, 0, 0, 0.82);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   z-index: 4;
+}
+
+.project-focus-card-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 242, 237, 0.45);
+  background: rgba(244, 242, 237, 0.2);
+  padding: 0;
 }
 
 .project-focus-card-dot.is-active {
   border-color: var(--accent-2);
   background: var(--accent-2);
-  width: 22px;
-  box-shadow: 0 0 0 4px rgba(247, 197, 72, 0.2);
+  transform: scale(1.4);
 }
 
 .project-focus-content {
@@ -655,9 +673,10 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    touch-action: pan-x;
+    justify-content: center;
+    scroll-padding-inline: 7%;
     overscroll-behavior-x: contain;
-    overscroll-behavior-y: auto;
+    touch-action: pan-x;
   }
 
   .projects-grid::-webkit-scrollbar,
@@ -669,13 +688,11 @@
   .service-widgets > .service-widget {
     flex: 0 0 86%;
     max-width: 86%;
+    margin: 0 auto;
     scroll-snap-align: center;
     scroll-snap-stop: always;
     transition: transform 0.35s ease, opacity 0.35s ease;
     touch-action: pan-x;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
   }
 
   .projects-carousel-control {

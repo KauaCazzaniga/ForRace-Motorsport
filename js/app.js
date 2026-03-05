@@ -1,4 +1,4 @@
-const fleetGalleryControllers = new Map();
+﻿const fleetGalleryControllers = new Map();
 const parseDelimitedList = (value, separator) =>
   (value || "")
     .split(separator)
@@ -16,6 +16,32 @@ const runFadeSwap = (element, fadeClassName, swapDelayMs, swap) => {
       window.setTimeout(clearFade, 280);
     }
   }, swapDelayMs);
+};
+
+let scrollLockState = null;
+const lockBodyScroll = () => {
+  if (scrollLockState) return;
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+  scrollLockState = { scrollY };
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+  document.body.style.overflow = "hidden";
+};
+
+const unlockBodyScroll = () => {
+  if (!scrollLockState) return;
+  const { scrollY } = scrollLockState;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  document.body.style.overflow = "";
+  window.scrollTo(0, scrollY);
+  scrollLockState = null;
 };
 
 const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
@@ -358,7 +384,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   closeButton.type = "button";
   closeButton.className = "fleet-focus-close";
   closeButton.setAttribute("aria-label", "Fechar destaque");
-  closeButton.textContent = "�";
+  closeButton.textContent = "ï¿½";
 
   const media = document.createElement("img");
   media.className = "fleet-focus-media";
@@ -577,7 +603,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   const card = document.createElement("article");
   card.className = "project-focus-card";
   card.style.position = "relative";
-  card.style.touchAction = "pan-x";
+  card.style.touchAction = "pan-y";
 
   const header = document.createElement("div");
   header.className = "project-focus-header";
@@ -643,14 +669,14 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   tagLine.setAttribute("aria-hidden", "true");
   const tagLabel = document.createElement("span");
   tagLabel.className = "project-tag-label";
-  tagLabel.textContent = "Descrição";
+  tagLabel.textContent = "DescriÃ§Ã£o";
   tag.append(tagLine, tagLabel);
   const trackButtons = document.createElement("div");
   trackButtons.className = "project-track-buttons";
   tagRow.append(tag);
   const trackHeading = document.createElement("div");
   trackHeading.className = "project-track-heading";
-  trackHeading.textContent = "Autódromos";
+  trackHeading.textContent = "AutÃ³dromos";
   const title = document.createElement("h3");
   const projectInfo = document.createElement("div");
   projectInfo.className = "project-info";
@@ -686,8 +712,13 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   let activeIndex = 0;
   let activeTrackIndex = 0;
   let activeView = "project";
+  const projectMediaQuery = window.matchMedia("(max-width: 720px)");
 
-  const trackIcons = ["img/track-01.png", "img/track-02.png", "img/track-03.png", "img/track-04.png"];
+  const setOverlayDisplay = () => {
+    overlay.style.display = projectMediaQuery.matches ? "flex" : "grid";
+  };
+
+  const trackIcons = ["img/track-01.webp", "img/track-02.webp", "img/track-03.webp", "img/track-04.webp"];
   trackIcons.forEach((src, index) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -820,7 +851,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
       rentCta.removeAttribute("href");
       rentCta.style.pointerEvents = "none";
       rentCta.style.opacity = "0.6";
-      rentCta.textContent = "Locação indisponível";
+      rentCta.textContent = "LocaÃ§Ã£o indisponÃ­vel";
       rentCta.setAttribute("aria-disabled", "true");
       rentCta.removeAttribute("target");
       rentCta.removeAttribute("rel");
@@ -856,10 +887,6 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
   };
 
   const open = (cardIndex, trackIndex = null) => {
-    if (window.matchMedia && window.matchMedia("(max-width: 720px)").matches) {
-      overlay.style.touchAction = "pan-x";
-      card.style.touchAction = "pan-x";
-    }
     setActiveProjectCard(cardIndex);
     if (Number.isFinite(trackIndex)) {
       activeView = "track";
@@ -869,7 +896,10 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     overlay.scrollTop = 0;
     overlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("is-overlay-open");
-    overlay.style.display = "grid";
+    setOverlayDisplay();
+    overlay.style.touchAction = "pan-y";
+    card.style.touchAction = "pan-y";
+    lockBodyScroll();
     window.setTimeout(() => overlay.classList.add("is-visible"), 20);
   };
 
@@ -879,6 +909,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
       document.body.classList.remove("is-overlay-open");
+      unlockBodyScroll();
       activeData = null;
     }, 280);
   };
@@ -912,7 +943,7 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     preview.className = "project-rent-preview";
 
     const previewTitle = document.createElement("h4");
-    previewTitle.textContent = rentUrl ? "Aluga-se" : "Indisponível";
+    previewTitle.textContent = rentUrl ? "Aluga-se" : "IndisponÃ­vel";
     preview.append(previewTitle);
     const summaryElement = el.querySelector("p");
     if (summaryElement) {
@@ -997,6 +1028,17 @@ const bindHorizontalSwipe = (element, onSwipeLeft, onSwipeRight) => {
     if (event.key === "ArrowRight") changeSlide((index, size) => (index + 1) % size);
     if (event.key === "ArrowLeft") changeSlide((index, size) => (index - 1 + size) % size);
   });
+
+  const syncOverlayOnResize = () => {
+    if (overlay.style.display === "none") return;
+    setOverlayDisplay();
+  };
+
+  if (typeof projectMediaQuery.addEventListener === "function") {
+    projectMediaQuery.addEventListener("change", syncOverlayOnResize);
+  } else if (typeof projectMediaQuery.addListener === "function") {
+    projectMediaQuery.addListener(syncOverlayOnResize);
+  }
 
   overlay.style.display = "none";
 })();

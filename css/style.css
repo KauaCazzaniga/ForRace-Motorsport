@@ -48,7 +48,6 @@ body.is-overlay-open .mobile-quick-nav {
 
 body.is-overlay-open {
   overflow: hidden;
-  touch-action: none;
 }
 
     .wrap {

@@ -52,9 +52,33 @@
     const trackNote = document.createElement("p");
     trackNote.className = "project-focus-copy project-track-note";
 
-    content.append(title, projectInfo, trackHeading, trackButtons, trackNote);
+    const rentWidget = document.createElement("div");
+    rentWidget.className = "project-focus-rent-widget";
+    rentWidget.innerHTML = `
+        <div class="rent-info">
+            <span class="rent-badge">ALUGA-SE</span>
+            <p class="rent-label"></p>
+        </div>
+        <a class="rent-cta" href="" target="_blank" rel="noopener">
+            WhatsApp
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12.04 3a8.94 8.94 0 0 0-7.8 13.33L3 21l4.83-1.27A8.94 8.94 0 1 0 12.04 3zm0 1.8a7.14 7.14 0 1 1 0 14.28 7.1 7.1 0 0 1-3.64-1l-.27-.16-2.84.74.76-2.77-.18-.29a7.12 7.12 0 0 1-1.12-3.8A7.14 7.14 0 0 1 12.04 4.8zm4.1 9.15c-.22-.11-1.28-.63-1.47-.7-.2-.07-.34-.11-.49.11-.14.22-.56.7-.69.85-.12.14-.25.16-.46.05-.22-.1-.9-.33-1.7-1.06-.62-.56-1.04-1.26-1.16-1.47-.12-.22-.01-.33.09-.43.09-.09.22-.25.33-.37.11-.12.14-.21.22-.35.07-.14.03-.27-.02-.38-.06-.11-.49-1.18-.67-1.61-.18-.43-.36-.37-.49-.37h-.42c-.14 0-.38.05-.58.27-.2.22-.76.74-.76 1.8 0 1.05.78 2.07.89 2.21.11.14 1.54 2.35 3.73 3.29.52.22.93.35 1.25.45.52.16 1 .14 1.38.09.42-.06 1.28-.52 1.46-1.03.18-.5.18-.93.12-1.03-.05-.1-.2-.16-.42-.27z"/></svg>
+        </a>
+    `;
+
+    content.append(title, projectInfo, trackHeading, trackButtons, trackNote, rentWidget);
     card.append(header, closeButton, mediaWrap, content);
-    overlay.append(card);
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "focus-nav-btn is-prev";
+    prevBtn.innerHTML = "&#8249;";
+    prevBtn.setAttribute("aria-label", "Projeto anterior");
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "focus-nav-btn is-next";
+    nextBtn.innerHTML = "&#8250;";
+    nextBtn.setAttribute("aria-label", "Próximo projeto");
+
+    overlay.append(prevBtn, card, nextBtn);
     projectRoot.appendChild(overlay);
 
     let activeCardIndex = 0;
@@ -107,20 +131,11 @@
             }
         }
 
-        // Dots and Track Buttons
-        dots.innerHTML = "";
-        data.gallery.forEach((_, i) => {
-            const dot = document.createElement("button");
-            dot.className = `project-focus-dot ${i === activePhotoIndex ? "is-active" : ""}`;
-            dot.addEventListener("click", () => { activePhotoIndex = i; render(); });
-            dots.appendChild(dot);
-        });
-
         trackButtons.innerHTML = "";
         tracks.forEach((t, i) => {
             const btn = document.createElement("button");
             btn.className = `project-track-button ${isTrackView && i === activeTrackIndex ? "is-active" : ""}`;
-            btn.innerHTML = `<img src="img/track-01.webp" alt="Pista">`; // Use dynamic icons if needed
+            btn.innerHTML = `<img src="img/track-01.webp" alt="Pista">`;
             btn.addEventListener("click", () => {
                 if (activeView === "track" && activeTrackIndex === i) {
                     activeView = "project";
@@ -132,6 +147,37 @@
             });
             trackButtons.appendChild(btn);
         });
+
+        // Rent Widget logic
+        if (data.rentLabel) {
+            rentWidget.style.display = "block";
+            rentWidget.querySelector(".rent-label").textContent = data.rentLabel;
+            const rentCta = rentWidget.querySelector(".rent-cta");
+            if (data.rentUrl) {
+                rentCta.style.display = "inline-flex";
+                rentCta.href = data.rentUrl;
+            } else {
+                rentCta.style.display = "none";
+            }
+        } else {
+            rentWidget.style.display = "none";
+        }
+    };
+
+    const next = () => {
+        activeCardIndex = (activeCardIndex + 1) % projectDataList.length;
+        activePhotoIndex = 0;
+        activeTrackIndex = 0;
+        activeView = "project";
+        render();
+    };
+
+    const prev = () => {
+        activeCardIndex = (activeCardIndex - 1 + projectDataList.length) % projectDataList.length;
+        activePhotoIndex = 0;
+        activeTrackIndex = 0;
+        activeView = "project";
+        render();
     };
 
     const open = (index) => {
@@ -165,7 +211,9 @@
             detail: el.dataset.detail || "",
             gallery,
             alts,
-            tracks: trackInfo
+            tracks: trackInfo,
+            rentLabel: el.dataset.rentLabel || "",
+            rentUrl: el.dataset.rentUrl || ""
         });
 
         el.addEventListener("click", (e) => {
@@ -176,6 +224,20 @@
 
     closeButton.addEventListener("click", close);
     overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+    prevBtn.addEventListener("click", prev);
+    nextBtn.addEventListener("click", next);
+
+    // Navigation
+    document.addEventListener("keydown", (e) => {
+        if (!overlay.classList.contains("is-visible")) return;
+        if (e.key === "Escape") close();
+        if (e.key === "ArrowRight") next();
+        if (e.key === "ArrowLeft") prev();
+    });
+
+    if (window.bindHorizontalSwipe) {
+        window.bindHorizontalSwipe(overlay, next, prev);
+    }
 
     // Animated CoverFlow for Projects Carousel
     (() => {

@@ -34,9 +34,20 @@
     const copy = document.createElement("p");
     copy.className = "fleet-focus-copy";
 
-    content.append(title, copy);
-    card.append(media, closeButton, dotsGrid, content);
-    overlay.appendChild(card);
+    content.append(title, copy, dotsGrid);
+    card.append(media, closeButton, content);
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "focus-nav-btn is-prev";
+    prevBtn.innerHTML = "&#8249;";
+    prevBtn.setAttribute("aria-label", "Carro anterior");
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "focus-nav-btn is-next";
+    nextBtn.innerHTML = "&#8250;";
+    nextBtn.setAttribute("aria-label", "Próximo carro");
+
+    overlay.append(prevBtn, card, nextBtn);
     fleetFocusRoot.appendChild(overlay);
 
     let activeFleetIndex = 0;
@@ -68,6 +79,18 @@
                 dotsGrid.appendChild(dot);
             });
         }
+    };
+
+    const next = () => {
+        activeFleetIndex = (activeFleetIndex + 1) % fleetData.length;
+        activePhotoIndex = 0;
+        render();
+    };
+
+    const prev = () => {
+        activeFleetIndex = (activeFleetIndex - 1 + fleetData.length) % fleetData.length;
+        activePhotoIndex = 0;
+        render();
     };
 
     const open = (index) => {
@@ -108,19 +131,18 @@
         if (e.target === overlay) close();
     });
 
+    prevBtn.addEventListener("click", prev);
+    nextBtn.addEventListener("click", next);
+
+    if (window.bindHorizontalSwipe) {
+        window.bindHorizontalSwipe(overlay, next, prev);
+    }
+
     // Keyboard
     document.addEventListener("keydown", (e) => {
         if (!overlay.classList.contains("is-visible")) return;
         if (e.key === "Escape") close();
-        if (e.key === "ArrowRight") {
-            const size = fleetData[activeFleetIndex].gallery.length;
-            activePhotoIndex = (activePhotoIndex + 1) % size;
-            render();
-        }
-        if (e.key === "ArrowLeft") {
-            const size = fleetData[activeFleetIndex].gallery.length;
-            activePhotoIndex = (activePhotoIndex - 1 + size) % size;
-            render();
-        }
+        if (e.key === "ArrowRight") next();
+        if (e.key === "ArrowLeft") prev();
     });
 })();
